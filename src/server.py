@@ -7,6 +7,7 @@ import cv2
 import os
 from objloader_simple import *
 from threading import Thread
+from time import sleep
 
 def projection_matrix(camera_parameters, homography):
 	homography = homography * (-1)
@@ -62,9 +63,8 @@ def main():
 		s.listen(0)
 		client, address = s.accept()
 		print(str(address)+" connected")
-
 		while 1:
-			if 1:
+			try:
 				frame = pickle.loads(client.recv(3000000))
 				print('0')
 				kp_frame, des_frame = orb.detectAndCompute(frame, None)
@@ -87,10 +87,9 @@ def main():
 						except:
 							pass
 				print('2')
-				client.send(pickle.dumps(frame))
-			else:
-				data = client.recv(6000000)
-				print(":(")
+				#client.send(pickle.dumps(frame))
+			except:
+				data = client.recv(10000000)
 
 		client.close()
 
