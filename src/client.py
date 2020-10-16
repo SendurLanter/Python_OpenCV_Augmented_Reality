@@ -5,13 +5,14 @@ import cv2
 
 cap = cv2.VideoCapture(0)
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s.connect(("34.80.93.191", 12345))
+s.connect(("140.112.20.181", 12345))
 print("connected")
 while cap.isOpened():
 	start=time()
 	ret, frame = cap.read()
 	#s.sendall(b"ack")
 	s.sendall(pickle.dumps(frame))
+	print(time()-start)
 	'''try:
 		frame = pickle.loads(s.recv(3000000))
 		cv2.imshow('frame', frame)
@@ -20,5 +21,5 @@ while cap.isOpened():
 		print(":(")
 	if cv2.waitKey(1) & 0xFF == ord('q'):
 		break'''
-	print('FPS: ', 1/(time()-start) )
+	#print('FPS: ', 1/(time()-start) )
 s.close()
