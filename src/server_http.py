@@ -1,11 +1,15 @@
-import numpy as np
-import argparse
-import socket
-import math
+from flask import Flask, request
 import cv2
-from objloader_simple import *
-from threading import Thread
-from time import sleep
+
+headers = {'Content-Type': 'application/json'}
+app = Flask(__name__)
+app.debug = True
+@app.route('/',methods=['POST'])
+def sockeeet():
+	req = request.get_json()
+	print(req)
+	value[req['instance']]=req['data']
+
 
 def projection_matrix(camera_parameters, homography):
 	homography = homography * (-1)
@@ -47,33 +51,29 @@ def main():
 	camera_parameters = np.array([[800, 0, 320], [0, 800, 240], [0, 0, 1]])
 	orb = cv2.ORB_create()
 	bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
-	model = cv2.imread('reference/model.jpg', 0)
+	dir_name = os.getcwd()
+	model = cv2.imread(os.path.join(dir_name, 'reference/model.jpg'), 0)
 	kp_model, des_model = orb.detectAndCompute(model, None)
-	obj = OBJ('models/Only_Spider_with_Animations_Export.obj', swapyz=True)  
+	obj = OBJ(os.path.join(dir_name, 'models/Only_Spider_with_Animations_Export.obj'), swapyz=True)  
 
 	cap = cv2.VideoCapture(0)
 
-	s1 = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-	s1.bind(("", 11111))
-	s2 = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-	s2.bind(("", 22222))
+	HOST, PORT = "", 12345
+	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+	s.bind((HOST, PORT))
 	while 1:
-		s1.listen(0)
-		rx, address = s1.accept()
-		print(str(address))
-		s2.listen(0)
-		tx, address = s2.accept()
-		print(str(address))
+		s.listen(0)
+		client, address = s.accept()
+		print(str(address)+" connected")
 		while 1:
 			try:
-				data = rx.recv(3000000)
-				with open('server_save.jpg','wb') as f:
-					f.write(data)
-				frame = cv2.imread('server_save.jpg')
+				frame = pickle.loads(client.recv(3000000))
+				print('0')
 				kp_frame, des_frame = orb.detectAndCompute(frame, None)
 				matches = bf.match(des_model, des_frame)
 				matches = sorted(matches, key=lambda x: x.distance)
-				if len(matches) > 10:
+				print('1')
+				if len(matches) > MIN_MATCHES:
 					src_pts = np.float32([kp_model[m.queryIdx].pt for m in matches]).reshape(-1, 1, 2)
 					dst_pts = np.float32([kp_frame[m.trainIdx].pt for m in matches]).reshape(-1, 1, 2)
 					homography, mask = cv2.findHomography(src_pts, dst_pts, cv2.RANSAC, 5.0)
@@ -88,15 +88,9 @@ def main():
 							frame = render(frame, obj, projection, model, False)
 						except:
 							pass
-				cv2.imwrite('server_buffer.jpg', frame)
-				with open('server_buffer.jpg','rb') as f:
-					tx.sendall(f.read())
+				print('2')
+				#client.send(pickle.dumps(frame))
 			except:
-				data = rx.recv(10000000)
+				data = client.recv(10000000)
 
-parser = argparse.ArgumentParser(description='Augmented reality application')
-parser.add_argument('-r','--rectangle', help = 'draw rectangle delimiting target surface on frame', action = 'store_true')
-args = parser.parse_args()
-
-if __name__ == '__main__':
-	main()
+		client.close()
