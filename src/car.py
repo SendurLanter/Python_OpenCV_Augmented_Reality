@@ -22,13 +22,10 @@ start=time()
 old=[]
 while 1:
 	frame=cam.getframe()
+	cv2.imwrite('test.png',frame)
 	if frame==old:
 		count+=1
 		old=frame
-	#ret, frame = cap.read()
 	cv2.imshow('frame', frame)
 	if cv2.waitKey(1) & 0xFF == ord('q'):
 		break
-	if (time()-start)>10:
-		break
-print(count/10)

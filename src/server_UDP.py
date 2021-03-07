@@ -64,7 +64,7 @@ def main():
 			kp_frame, des_frame = orb.detectAndCompute(frame, None)
 			matches = bf.match(des_model, des_frame)
 			matches = sorted(matches, key=lambda x: x.distance)
-			if len(matches) > 10:
+			if len(matches) > 40:
 				src_pts = np.float32([kp_model[m.queryIdx].pt for m in matches]).reshape(-1, 1, 2)
 				dst_pts = np.float32([kp_frame[m.trainIdx].pt for m in matches]).reshape(-1, 1, 2)
 				homography, mask = cv2.findHomography(src_pts, dst_pts, cv2.RANSAC, 5.0)

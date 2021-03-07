@@ -4,7 +4,8 @@ import requests
 import socket
 import cv2
 
-cap=cv2.VideoCapture(0)
+#cap=cv2.VideoCapture(0)
+cap = cv2.VideoCapture('http://192.168.8.107:4747/mjpegfeed')
 s=socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 def sndv():
 	while cap.isOpened():
