@@ -39,7 +39,7 @@ def main():
         #def send():
         try:
             start=time()
-            r=requests.post('http://localhost:5000',files=files, timeout=0.1)
+            r=requests.post('http://34.80.232.139:80',files=files, timeout=0.1)
             with open('display.jpg','wb') as f:
                 f.write(r.content)
             print( (time()-start) )

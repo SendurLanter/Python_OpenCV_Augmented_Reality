@@ -102,16 +102,16 @@ def test():
 
             # if a valid homography matrix was found render cube on model plane
             if homography is not None:
-                
-                # obtain 3D projection matrix from homography matrix and camera parameters
-                projection = projection_matrix(camera_parameters, homography)  
-                # project cube or model
+                try:
+                    # obtain 3D projection matrix from homography matrix and camera parameters
+                    projection = projection_matrix(camera_parameters, homography)  
+                    # project cube or model
                 frame = render(frame, obj, projection, model, False)
-                #except:
-                #    pass
+                except:
+                    pass
     cv2.imwrite('remote.jpg',frame)
     with open('remote.jpg','rb') as f:
         return f.read()
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=80)
