@@ -94,6 +94,8 @@ def test():
         dst_pts = np.float32([kp_frame[m.trainIdx].pt for m in matches]).reshape(-1, 1, 2)
         # compute Homography
         check=time()
+        proj=0
+        start3=0
         homography, mask = cv2.findHomography(src_pts, dst_pts, cv2.RANSAC, 5.0)
         if time()-check<0.0042:
 

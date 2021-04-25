@@ -6,6 +6,7 @@ import json
 import os
 from objloader_simple import *
 from threading import Thread
+from pathlib import Path
 from time import time
 #MIN_MATCHES = 70
 #rectangle=True
@@ -34,7 +35,7 @@ def main():
         #frame=cv2.imread('test.jpg')
         ret, frame = cap.read()
         cv2.imwrite('local.jpg',frame)
-        print('Transmitted task:', Path(local.jpg).stat().st_size/1024, 'KB')
+        print('Transmitted task:', Path('local.jpg').stat().st_size/1024, 'KB')
         frame=open('local.jpg','rb')
         files={'file':('AR',frame,'image/jpg')}
         try:
