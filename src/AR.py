@@ -34,15 +34,15 @@ def main():
         #frame=cv2.imread('test.jpg')
         ret, frame = cap.read()
         cv2.imwrite('local.jpg',frame)
+        print('Transmitted task:', Path(local.jpg).stat().st_size/1024, 'KB')
         frame=open('local.jpg','rb')
         files={'file':('AR',frame,'image/jpg')}
         try:
-            start=time()
             r=requests.post('http://34.80.232.139:80',files=files, timeout=0.1)
             with open('display.jpg','wb') as f:
                 f.write(r.content)
-            print( (time()-start) )
             cv2.imshow('frame', cv2.imread('display.jpg'))
+            print('Received execution result')
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
         except:

@@ -74,41 +74,52 @@ def test():
     request.files['file'].save('remote.jpg')
     frame=cv2.imread('remote.jpg')
 
+    start=time()
     # find and draw the keypoints of the frame
     kp_frame, des_frame = orb.detectAndCompute(frame, None)
     # match frame descriptors with model descriptors
     matches = bf.match(des_model, des_frame)
     # sort them in the order of their distance the lower the distance, the better the match
     matches = sorted(matches, key=lambda x: x.distance)
-    print(len(matches))
+
+    detect=time()-start
+
     # compute Homography if enough matches are found
     if len(matches) > MIN_MATCHES:
+
+        start2=time()
+
         # differenciate between source points and destination points
         src_pts = np.float32([kp_model[m.queryIdx].pt for m in matches]).reshape(-1, 1, 2)
         dst_pts = np.float32([kp_frame[m.trainIdx].pt for m in matches]).reshape(-1, 1, 2)
         # compute Homography
-        start=time()
+        check=time()
         homography, mask = cv2.findHomography(src_pts, dst_pts, cv2.RANSAC, 5.0)
-        if time()-start<0.02:
-
-            if rectangle:
-                # Draw a rectangle that marks the found model in the frame
-                h, w = model.shape
-                pts = np.float32([[0, 0], [0, h - 1], [w - 1, h - 1], [w - 1, 0]]).reshape(-1, 1, 2)
-                # project corners into frame
-                dst = cv2.perspectiveTransform(pts, homography)
-                # connect them with lines  
-                frame = cv2.polylines(frame, [np.int32(dst)], True, 255, 3, cv2.LINE_AA)  
+        if time()-check<0.0042:
 
             # if a valid homography matrix was found render cube on model plane
             if homography is not None:
                 try:
                     # obtain 3D projection matrix from homography matrix and camera parameters
                     projection = projection_matrix(camera_parameters, homography)  
+                    
+                    proj=time()-start2
+
+                    start3=time()
+                    if rectangle:
+                        # Draw a rectangle that marks the found model in the frame
+                        h, w = model.shape
+                        pts = np.float32([[0, 0], [0, h - 1], [w - 1, h - 1], [w - 1, 0]]).reshape(-1, 1, 2)
+                        # project corners into frame
+                        dst = cv2.perspectiveTransform(pts, homography)
+                        # connect them with lines  
+                        frame = cv2.polylines(frame, [np.int32(dst)], True, 255, 3, cv2.LINE_AA)
                     # project cube or model
                     frame = render(frame, obj, projection, model, False)
+
                 except:
                     pass
+    print('Total execution time:', time()-start, 'Detect time:', detect, 'Project time:', proj, 'Render time:', time()-start3, 'Detected keypoints:', len(matches))
     cv2.imwrite('remote.jpg',frame)
     with open('remote.jpg','rb') as f:
         return f.read()
