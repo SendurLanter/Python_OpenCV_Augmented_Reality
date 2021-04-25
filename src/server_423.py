@@ -1,12 +1,11 @@
 from flask import Flask, request, jsonify
 from objloader_simple import *
-from time import time
 import numpy as np
 import cv2
 import os
 import math
 
-MIN_MATCHES=50
+MIN_MATCHES=54
 rectangle=True
 
 homography = None
@@ -73,7 +72,6 @@ app = Flask(__name__)
 def test():
     request.files['file'].save('remote.jpg')
     frame=cv2.imread('remote.jpg')
-
     # find and draw the keypoints of the frame
     kp_frame, des_frame = orb.detectAndCompute(frame, None)
     # match frame descriptors with model descriptors
@@ -89,6 +87,7 @@ def test():
         # compute Homography
         start=time()
         homography, mask = cv2.findHomography(src_pts, dst_pts, cv2.RANSAC, 5.0)
+        print(time()-start)
         if time()-start<0.02:
 
             if rectangle:
@@ -106,7 +105,7 @@ def test():
                     # obtain 3D projection matrix from homography matrix and camera parameters
                     projection = projection_matrix(camera_parameters, homography)  
                     # project cube or model
-                frame = render(frame, obj, projection, model, False)
+                    frame = render(frame, obj, projection, model, False)
                 except:
                     pass
     cv2.imwrite('remote.jpg',frame)

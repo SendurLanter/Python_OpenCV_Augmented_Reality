@@ -36,16 +36,12 @@ def main():
         cv2.imwrite('local.jpg',frame)
         frame=open('local.jpg','rb')
         files={'file':('AR',frame,'image/jpg')}
-        #def send():
         try:
             start=time()
             r=requests.post('http://34.80.232.139:80',files=files, timeout=0.1)
             with open('display.jpg','wb') as f:
                 f.write(r.content)
             print( (time()-start) )
-
-            #Thread(target=send).start()
-            # show result
             cv2.imshow('frame', cv2.imread('display.jpg'))
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
