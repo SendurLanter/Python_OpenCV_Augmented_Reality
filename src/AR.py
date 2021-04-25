@@ -7,8 +7,8 @@ import os
 from objloader_simple import *
 from threading import Thread
 from time import time
-MIN_MATCHES = 70
-rectangle=True
+#MIN_MATCHES = 70
+#rectangle=True
 
 #This functions loads the target surface image
 def main():
@@ -37,17 +37,20 @@ def main():
         frame=open('local.jpg','rb')
         files={'file':('AR',frame,'image/jpg')}
         #def send():
-        start=time()
-        r=requests.post('http://localhost:5000',files=files, timeout=0.1)
-        with open('display.jpg','wb') as f:
-            f.write(r.content)
-        print( (time()-start) )
+        try:
+            start=time()
+            r=requests.post('http://localhost:5000',files=files, timeout=0.1)
+            with open('display.jpg','wb') as f:
+                f.write(r.content)
+            print( (time()-start) )
 
-        #Thread(target=send).start()
-        # show result
-        cv2.imshow('frame', cv2.imread('display.jpg'))
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
+            #Thread(target=send).start()
+            # show result
+            cv2.imshow('frame', cv2.imread('display.jpg'))
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                break
+        except:
+            pass
 
         '''# find and draw the keypoints of the frame
         kp_frame, des_frame = orb.detectAndCompute(frame, None)

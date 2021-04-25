@@ -4,8 +4,9 @@ from time import time
 import numpy as np
 import cv2
 import os
+import math
 
-MIN_MATCHES=70
+MIN_MATCHES=50
 rectangle=True
 
 homography = None
@@ -17,7 +18,7 @@ orb = cv2.ORB_create()
 bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
 # load the reference surface that will be searched in the video stream
 dir_name = os.getcwd()
-model = cv2.imread(os.path.join(dir_name, 'reference/Untitled6.jpg'), 0)
+model = cv2.imread(os.path.join(dir_name, 'reference/Untitled.jpg'), 0)
 # Compute model keypoints and its descriptors
 kp_model, des_model = orb.detectAndCompute(model, None)
 # Load 3D model from OBJ file
@@ -79,6 +80,7 @@ def test():
     matches = bf.match(des_model, des_frame)
     # sort them in the order of their distance the lower the distance, the better the match
     matches = sorted(matches, key=lambda x: x.distance)
+    print(len(matches))
     # compute Homography if enough matches are found
     if len(matches) > MIN_MATCHES:
         # differenciate between source points and destination points
@@ -100,13 +102,13 @@ def test():
 
             # if a valid homography matrix was found render cube on model plane
             if homography is not None:
-                try:
-                    # obtain 3D projection matrix from homography matrix and camera parameters
-                    projection = projection_matrix(camera_parameters, homography)  
-                    # project cube or model
-                    frame = render(frame, obj, projection, model, False)
-                except:
-                    pass
+                
+                # obtain 3D projection matrix from homography matrix and camera parameters
+                projection = projection_matrix(camera_parameters, homography)  
+                # project cube or model
+                frame = render(frame, obj, projection, model, False)
+                #except:
+                #    pass
     cv2.imwrite('remote.jpg',frame)
     with open('remote.jpg','rb') as f:
         return f.read()
