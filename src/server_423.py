@@ -118,10 +118,9 @@ def test():
                         frame = cv2.polylines(frame, [np.int32(dst)], True, 255, 3, cv2.LINE_AA)
                     # project cube or model
                     frame = render(frame, obj, projection, model, False)
-
+                    print('Total execution time:', time()-start, 'Detect time:', detect, 'Project time:', proj, 'Render time:', time()-start3, 'Detected keypoints:', len(matches))
                 except:
                     pass
-    print('Total execution time:', time()-start, 'Detect time:', detect, 'Project time:', proj, 'Render time:', time()-start3, 'Detected keypoints:', len(matches))
     cv2.imwrite('remote.jpg',frame)
     with open('remote.jpg','rb') as f:
         return f.read()

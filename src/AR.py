@@ -44,6 +44,7 @@ def main():
                 f.write(r.content)
             cv2.imshow('frame', cv2.imread('display.jpg'))
             print('Received execution result')
+            print('\n')
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
         except:
