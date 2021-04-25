@@ -49,15 +49,14 @@ def main():
 	bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
 	model = cv2.imread('reference/model.jpg', 0)
 	kp_model, des_model = orb.detectAndCompute(model, None)
-	obj = OBJ('models/Only_Spider_with_Animations_Export.obj', swapyz=True)  
-
-	cap = cv2.VideoCapture(0)
+	obj = OBJ('models/spider.obj', swapyz=True)  
 
 	s=socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 	s.bind(("", 12345))
 	while 1:
 		try:
 			data, address = s.recvfrom(3000000)
+			print(address)
 			with open('server_save.jpg','wb') as f:
 				f.write(data)
 			frame = cv2.imread('server_save.jpg')
@@ -85,10 +84,6 @@ def main():
 		except:
 			data, address = s.recvfrom(6000000)
 			print(':(')
-
-parser = argparse.ArgumentParser(description='Augmented reality application')
-parser.add_argument('-r','--rectangle', help = 'draw rectangle delimiting target surface on frame', action = 'store_true')
-args = parser.parse_args()
 
 if __name__ == '__main__':
 	main()
