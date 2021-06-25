@@ -22,10 +22,10 @@ start=time()
 old=[]
 while 1:
 	frame=cam.getframe()
-	cv2.imwrite('test.png',frame)
 	if frame==old:
 		count+=1
 		old=frame
 	cv2.imshow('frame', frame)
 	if cv2.waitKey(1) & 0xFF == ord('q'):
+		cv2.imwrite('test.png',frame)
 		break

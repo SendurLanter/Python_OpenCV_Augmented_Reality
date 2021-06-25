@@ -8,12 +8,12 @@ from objloader_simple import *
 from threading import Thread
 from pathlib import Path
 from time import time
-#MIN_MATCHES = 70
-#rectangle=True
+MIN_MATCHES=55
+rectangle=True
 
 #This functions loads the target surface image
 def main():
-    '''homography = None
+    homography = None
     # matrix of camera parameters (made up but works quite well for me)
     camera_parameters = np.array([[800, 0, 320], [0, 800, 240], [0, 0, 1]])
     # create ORB keypoint detector
@@ -22,11 +22,11 @@ def main():
     bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
     # load the reference surface that will be searched in the video stream
     dir_name = os.getcwd()
-    model = cv2.imread(os.path.join(dir_name, 'reference/Untitled6.jpg'), 0)
+    model = cv2.imread(os.path.join(dir_name, 'reference/model.jpg'), 0)
     # Compute model keypoints and its descriptors
     kp_model, des_model = orb.detectAndCompute(model, None)
     # Load 3D model from OBJ file
-    obj = OBJ(os.path.join(dir_name, 'models/spider.obj'), swapyz=True)'''  
+    obj = OBJ(os.path.join(dir_name, 'models/spider.obj'), swapyz=True)
     # init video capture
     cap = cv2.VideoCapture(0)
 
@@ -34,39 +34,24 @@ def main():
         # read the current frame
         #frame=cv2.imread('test.jpg')
         ret, frame = cap.read()
-        cv2.imwrite('local.jpg',frame)
-        frame=open('local.jpg','rb')
-        files={'file':('AR',frame,'image/jpg')}
-        try:
-            r=requests.post('http://34.80.232.139:80',files=files, timeout=0.1)
-            with open('display.jpg','wb') as f:
-                f.write(r.content)
-            cv2.imshow('frame', cv2.imread('display.jpg'))
-            print('Received execution result')
-            print('\n')
-            if cv2.waitKey(1) & 0xFF == ord('q'):
-                break
-        except:
-            pass
 
-        '''# find and draw the keypoints of the frame
+        # find and draw the keypoints of the frame
         kp_frame, des_frame = orb.detectAndCompute(frame, None)
         # match frame descriptors with model descriptors
         matches = bf.match(des_model, des_frame)
         
         # sort them in the order of their distance the lower the distance, the better the match
         matches = sorted(matches, key=lambda x: x.distance)
-        #print(len(matches))
+        print(len(matches))
         # compute Homography if enough matches are found
         if len(matches) > MIN_MATCHES:
             # differenciate between source points and destination points
             src_pts = np.float32([kp_model[m.queryIdx].pt for m in matches]).reshape(-1, 1, 2)
             dst_pts = np.float32([kp_frame[m.trainIdx].pt for m in matches]).reshape(-1, 1, 2)
-            print(src_pts, dst_pts)
             start=time()
             # compute Homography
             homography, mask = cv2.findHomography(src_pts, dst_pts, cv2.RANSAC, 5.0)
-            if time()-start>0.02:
+            if time()-start<0.02:
 
                 if rectangle:
                     # Draw a rectangle that marks the found model in the frame
@@ -139,7 +124,7 @@ def projection_matrix(camera_parameters, homography):
     rot_3 = np.cross(rot_1, rot_2)
     # finally, compute the 3D projection matrix from the model to the current frame
     projection = np.stack((rot_1, rot_2, rot_3, translation)).T
-    return np.dot(camera_parameters, projection)'''
+    return np.dot(camera_parameters, projection)
 
 if __name__ == '__main__':
     main()
